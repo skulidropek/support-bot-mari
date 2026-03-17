@@ -8,3 +8,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 reports/
+.env
+*.db
+*.log
+*.sqlite
+bot-state.json
