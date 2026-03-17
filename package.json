@@ -42,10 +42,15 @@
     "onlyBuiltDependencies": [
       "@parcel/watcher",
       "msgpackr-extract",
-      "unrs-resolver"
+      "unrs-resolver",
+      "better-sqlite3",
+      "sqlite3"
     ],
     "patchedDependencies": {
       "@typescript-eslint/eslint-plugin@8.55.0": "patches/@typescript-eslint__eslint-plugin@8.55.0.patch"
     }
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
   }
 }

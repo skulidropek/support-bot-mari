@@ -1,54 +1,21 @@
 import { describe, expect, it } from "@effect/vitest"
-import { Effect } from "effect"
-import { vi } from "vitest"
+import { Effect, Layer } from "effect"
 
 import { program } from "../../src/app/program.js"
+import { TelegramBot } from "../../src/shell/telegram.js"
 
-const withLogSpy = Effect.acquireRelease(
-  Effect.sync(() => vi.spyOn(console, "log").mockImplementation(() => {})),
-  (spy) =>
-    Effect.sync(() => {
-      spy.mockRestore()
-    })
+// Mock TelegramBot Layer
+const MockTelegramBotLive = Layer.succeed(
+  TelegramBot,
+  TelegramBot.of({
+    start: Effect.void
+  })
 )
 
-const withArgv = (nextArgv: ReadonlyArray<string>) =>
-  Effect.acquireRelease(
-    Effect.sync(() => {
-      const previous = process.argv
-      process.argv = [...nextArgv]
-      return previous
-    }),
-    (previous) =>
-      Effect.sync(() => {
-        process.argv = previous
-      })
-  )
-
 describe("main program", () => {
-  it.effect("logs default greeting when no args", () =>
-    Effect.scoped(
-      Effect.gen(function*(_) {
-        const logSpy = yield* _(withLogSpy)
-        yield* _(withArgv(["node", "main"]))
-        yield* _(program)
-        yield* _(Effect.sync(() => {
-          expect(logSpy).toHaveBeenCalledTimes(1)
-          expect(logSpy).toHaveBeenLastCalledWith("Hello from Effect!")
-        }))
-      })
-    ))
-
-  it.effect("logs named greeting when name is provided", () =>
-    Effect.scoped(
-      Effect.gen(function*(_) {
-        const logSpy = yield* _(withLogSpy)
-        yield* _(withArgv(["node", "main", "Alice"]))
-        yield* _(program)
-        yield* _(Effect.sync(() => {
-          expect(logSpy).toHaveBeenCalledTimes(1)
-          expect(logSpy).toHaveBeenLastCalledWith("Hello, Alice!")
-        }))
-      })
-    ))
+  it.effect("starts the bot successfully", () =>
+    Effect.gen(function*(_) {
+      const result = yield* _(Effect.provide(program, MockTelegramBotLive))
+      expect(result).toBeUndefined()
+    }))
 })
